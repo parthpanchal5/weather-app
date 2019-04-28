@@ -1,0 +1,106 @@
+const express = require('express')
+const path = require('path')
+const app = express()
+const hbs = require('hbs')
+const geocode = require('./utils/geocode')
+const forecast = require('./utils/forecast')
+
+// Port number
+const PORT = 3000
+
+// Define path for Express config
+const publicDirectory =  path.join(__dirname, '../public')
+const viewsPath = path.join(__dirname, '../templates/views')
+const partialsPath = path.join(__dirname, '../templates/partials')
+
+// Setup handlebars engine and views location
+app.set('view engine', 'hbs')
+app.set('views', viewsPath)
+hbs.registerPartials(partialsPath)
+
+// Setup static directory to serve
+app.use(express.static(publicDirectory))
+
+
+// Routes
+app.get('', (req, res) => {
+  res.render('index', {
+    title: 'Weathery',
+    name: 'Parth Panchal'
+  })
+})
+
+app.get('/about', (req, res) => {
+  res.render('about', {
+    title: 'About me',
+    name: 'Parth Panchal'
+  })
+})
+
+app.get('/help', (req, res) => {
+  res.render('help', {
+    message: 'Hi I am message from help page!',
+    title: 'Help',
+    name: 'Parth Panchal'
+  })
+})
+
+app.get('/weather', (req, res) => {
+  if(!req.query.address) {
+    return res.send({
+      error: 'Please provide address'
+    })
+  }
+  geocode(req.query.address, (error, { latitude, longitude, location } = {}) => {
+    if(error) {
+      return res.send({ error })
+    }
+    forecast(latitude, longitude, (error, forecastData) => {
+      if(error) {
+        return res.send({ error })
+      }
+      res.send({
+        forecast: forecastData, location,
+        address: req.query.address
+      })
+    }) 
+  })
+  // res.send({
+  //     forecast: 'It is Snowy',
+  //     location: 'Canada',
+  //     address: req.query.address
+  //   })
+})
+
+// app.get('/products', (req, res) => {
+//   if (!req.query.search) {
+//     return res.send({
+//       error: 'You must provide a search term'
+//     })
+//   } 
+//   console.log(req.query.search) 
+//   res.send({
+//     products: []
+//   })
+// })
+
+app.get('/help/*', (req, res) => {
+  res.render('404', {
+    title: '404',
+    name: 'Parth Panchal',
+    errorMessage: 'Help Article not found'
+  })
+})
+
+app.get('*', (req, res) => {
+  res.render('404', {
+    title: '404',
+    errorMessage: '404 Page not Found',
+    name: 'Parth Panchal'
+  })
+})
+
+// Start Server
+app.listen(PORT, () => {
+  console.log('Server Started => http://localhost:' + PORT)
+})
