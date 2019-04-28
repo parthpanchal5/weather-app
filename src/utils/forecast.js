@@ -10,7 +10,7 @@ const forecast = (latitude, longitude, callback) => {
 			callback("Unable to Find Location", undefined);
 		} else {
 			callback(undefined ,
-				"It is " + body.daily.data[0].summary + " with Cloud Cover of "+ body.currently.cloudCover +" \nIt is currently " + body.currently.temperature + " degrees out & humidity of "+ body.currently.humidity +", \nThere is a " +body.currently.precipProbability + "% chance of rain in " + body.timezone,
+				"It is " + body.daily.data[0].summary + " Cloud Cover of "+ body.currently.cloudCover +" \nIt is currently " + body.currently.temperature + " degrees out & humidity of "+ body.currently.humidity +", \nThere is a " +body.currently.precipProbability + "% chance of rain in " + body.timezone,
 			);
 		}
 	});
